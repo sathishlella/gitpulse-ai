@@ -1,0 +1,49 @@
+﻿node : file:///C:/Users/Sathish/Docu
+ments/Claude/Projects/Agents%20100%2
+0days/Day-06-GitPulse/node_modules/g
+roq-sdk/index.mjs:31
+At line:1 char:1
++ node server.js 2>&1 | Out-File 
+-Encoding utf8 error.log
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSp 
+   ecified: (file:///C:/User...dk/  
+  index.mjs:31:String) [], Remote   
+ Exception
+    + FullyQualifiedErrorId : Nativ 
+   eCommandError
+ 
+            throw new 
+Errors.GroqError("The GROQ_API_KEY 
+environment variable is missing or 
+empty; either provide it, or 
+instantiate the Groq client with an 
+apiKey option, like new Groq({ 
+apiKey: 'My API Key' }).");
+                  ^
+
+GroqError: The GROQ_API_KEY 
+environment variable is missing or 
+empty; either provide it, or 
+instantiate the Groq client with an 
+apiKey option, like new Groq({ 
+apiKey: 'My API Key' }).
+    at new Groq (file:///C:/Users/Sa
+thish/Documents/Claude/Projects/Agen
+ts%20100%20days/Day-06-GitPulse/node
+_modules/groq-sdk/index.mjs:31:19)
+    at file:///C:/Users/Sathish/Docu
+ments/Claude/Projects/Agents%20100%2
+0days/Day-06-GitPulse/lib/executor.j
+s:12:14
+    at ModuleJob.run (node:internal/
+modules/esm/module_job:343:25)
+    at async 
+onImport.tracePromise.__proto__ (nod
+e:internal/modules/esm/loader:647:26
+)
+    at async 
+asyncRunEntryPointWithESMLoader (nod
+e:internal/modules/run_main:117:5)
+
+Node.js v22.18.0

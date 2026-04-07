@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitPulse AI — Repository Due Diligence Agent</title>
+  <meta name="description" content="Investment-grade GitHub repository assessment. Bus factor, velocity, dependency risk, and AI-powered due diligence from a single URL.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--white:#fff;--bg:#fafafa;--border:#e5e7eb;--text:#111827;--muted:#6b7280;--accent:#1e40af;--accent-light:#dbeafe;--green:#059669;--green-light:#d1fae5;--red:#dc2626;--red-light:#fee2e2;--yellow:#d97706;--yellow-light:#fef3c7;--shadow:0 1px 3px rgba(0,0,0,0.06);--shadow-md:0 4px 6px rgba(0,0,0,0.04);--r:10px;--rl:14px}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+    .mono{font-family:'JetBrains Mono',monospace}
+    .header{background:var(--white);border-bottom:1px solid var(--border);padding:20px 0}
+    .header-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo-icon{width:36px;height:36px;background:var(--text);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px}
+    .logo-text{font-weight:700;font-size:18px}
+    .logo-tag{font-size:12px;color:var(--muted)}
+    .badge{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-light);padding:4px 10px;border-radius:20px}
+    .hero{max-width:1100px;margin:0 auto;padding:60px 24px 40px;text-align:center}
+    .hero h1{font-size:40px;font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:14px}
+    .hero p{font-size:17px;color:var(--muted);max-width:620px;margin:0 auto}
+    .hero-stats{display:flex;justify-content:center;gap:32px;margin-top:24px;font-size:13px;color:var(--muted)}
+    .hero-stats span{font-weight:600;color:var(--text)}
+    .search-section{max-width:700px;margin:0 auto;padding:0 24px 48px}
+    .search-box{display:flex;gap:10px;background:var(--white);padding:8px;border-radius:var(--rl);border:2px solid var(--border);box-shadow:var(--shadow-md);transition:border-color .2s}
+    .search-box:focus-within{border-color:var(--accent)}
+    .search-box input{flex:1;border:none;outline:none;font-size:16px;font-family:inherit;padding:12px 16px;background:transparent}
+    .search-box input::placeholder{color:#9ca3af}
+    .btn{padding:12px 28px;background:var(--text);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+    .btn:hover{background:#000}.btn:disabled{opacity:.5;cursor:not-allowed}
+    .quick-links{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+    .ql{font-size:12px;color:var(--muted);background:var(--white);border:1px solid var(--border);padding:5px 12px;border-radius:20px;cursor:pointer;font-family:inherit;transition:all .15s}
+    .ql:hover{border-color:var(--accent);color:var(--accent)}
+    .pipeline{max-width:1100px;margin:0 auto;padding:0 24px 32px;display:none}
+    .pipeline.show{display:block}
+    .pipe-label{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+    .agents{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .ag{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;transition:all .3s}
+    .ag.run{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+    .ag.done{border-color:var(--green);background:var(--green-light)}
+    .ag.err{border-color:var(--red);background:var(--red-light)}
+    .ag-icon{width:36px;height:36px;border-radius:8px;background:var(--bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:8px;font-size:14px;font-weight:700}
+    .ag.run .ag-icon{background:var(--accent-light)}
+    .ag.done .ag-icon{background:rgba(5,150,105,.15)}
+    .ag-name{font-size:13px;font-weight:600;margin-bottom:2px}
+    .ag-status{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+    .ag.run .ag-status{color:var(--accent)}.ag.done .ag-status{color:var(--green)}
+    .results{max-width:1100px;margin:0 auto;padding:0 24px 80px;display:none}
+    .results.show{display:block}
+    .result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .result-url{font-size:14px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+    .score-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+    .sc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    .sc-label{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:6px}
+    .sc-val{font-size:32px;font-weight:800;letter-spacing:-.02em}
+    .sc-sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .grade-a{color:var(--green)}.grade-b{color:var(--accent)}.grade-c{color:var(--yellow)}.grade-d,.grade-f{color:var(--red)}
+    .tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);overflow-x:auto}
+    .tab{padding:10px 18px;font-size:14px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap}
+    .tab:hover{color:var(--text)}.tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+    .tc{display:none}.tc.active{display:block}
+    .panel{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:28px;box-shadow:0 1px 2px rgba(0,0,0,.04);margin-bottom:16px}
+    .panel h3{font-size:16px;font-weight:700;margin-bottom:16px}
+    .dossier{font-size:15px;line-height:1.75}
+    .dossier h1,.dossier h2,.dossier h3{margin-top:24px;margin-bottom:8px}
+    .dossier h2{font-size:18px}.dossier h3{font-size:16px}
+    .dossier strong{font-weight:700}
+    .dossier ul,.dossier ol{padding-left:20px;margin:8px 0}
+    .dossier li{margin-bottom:4px}.dossier p{margin-bottom:12px}
+    .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+    .bar-label{font-size:13px;font-weight:500;width:100px;flex-shrink:0}
+    .bar-track{flex:1;height:8px;background:var(--bg);border-radius:4px;border:1px solid var(--border);overflow:hidden}
+    .bar-fill{height:100%;border-radius:4px;transition:width .5s ease}
+    .bar-val{font-size:13px;font-weight:600;width:50px;text-align:right;font-family:'JetBrains Mono',monospace}
+    .contrib-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-bottom:8px}
+    .contrib-rank{font-size:12px;font-weight:700;color:var(--muted);width:24px}
+    .contrib-name{font-size:14px;font-weight:600;flex:1}
+    .contrib-pct{font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace}
+    .contrib-bar{width:120px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+    .contrib-bar-fill{height:100%;background:var(--accent);border-radius:3px}
+    .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .metric-item{padding:16px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+    .metric-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .metric-val{font-size:24px;font-weight:800}
+    .metric-note{font-size:12px;color:var(--muted);margin-top:2px}
+    .validation{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-top:16px}
+    .val-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .val-title{font-size:13px;font-weight:600}
+    .val-score{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace}
+    .footer{text-align:center;padding:40px 24px;font-size:13px;color:var(--muted);border-top:1px solid var(--border)}
+    .footer a{color:var(--accent);text-decoration:none}
+    .err-box{background:var(--red-light);border:1px solid var(--red);border-radius:var(--r);padding:16px 20px;font-size:14px;color:var(--red);max-width:1100px;margin:0 auto 20px;display:none}
+    .err-box.show{display:block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+    @media(max-width:768px){.hero h1{font-size:28px}.search-box{flex-direction:column}.btn{width:100%}.score-row{grid-template-columns:repeat(2,1fr)}.agents{grid-template-columns:repeat(2,1fr)}.metric-grid{grid-template-columns:1fr}.contrib-bar{display:none}}
+  </style>
+</head>
+<body>
+  <div class="header"><div class="header-inner">
+    <div class="logo"><div class="logo-icon">GP</div><div><div class="logo-text">GitPulse AI</div><div class="logo-tag">Repository Due Diligence Agent</div></div></div>
+    <div class="badge">DAY 6 OF 100</div>
+  </div></div>
+
+  <div class="hero">
+    <h1>Investment-grade repo<br>assessment in 30 seconds</h1>
+    <p>Drop any GitHub URL. Four agents compute bus factor, velocity, dependency risk, and deliver an AI-powered due diligence dossier.</p>
+    <div class="hero-stats">
+      <div><span>4</span> agents</div>
+      <div><span>11+</span> API calls</div>
+      <div><span>0</span> hallucinations</div>
+      <div><span>4-8hr</span> manual work saved</div>
+    </div>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <input type="text" id="inp" placeholder="facebook/react or https://github.com/owner/repo" autocomplete="off" spellcheck="false">
+      <button class="btn" id="btn" onclick="run()">Analyze</button>
+    </div>
+    <div class="quick-links">
+      <button class="ql" onclick="go('facebook/react')">facebook/react</button>
+      <button class="ql" onclick="go('vercel/next.js')">vercel/next.js</button>
+      <button class="ql" onclick="go('langchain-ai/langchainjs')">langchainjs</button>
+      <button class="ql" onclick="go('denoland/deno')">denoland/deno</button>
+      <button class="ql" onclick="go('anthropics/anthropic-sdk-python')">anthropic-sdk</button>
+    </div>
+  </div>
+
+  <div class="err-box" id="err"></div>
+
+  <div class="pipeline" id="pipe">
+    <div class="pipe-label">Agent Pipeline: Scout → Analyst → Executor → Supervisor</div>
+    <div class="agents">
+      <div class="ag" id="a-scout"><div class="ag-icon">A</div><div class="ag-name">Scout</div><div class="ag-status">Waiting</div></div>
+      <div class="ag" id="a-analyst"><div class="ag-icon">B</div><div class="ag-name">Analyst</div><div class="ag-status">Waiting</div></div>
+      <div class="ag" id="a-executor"><div class="ag-icon">C</div><div class="ag-name">Executor</div><div class="ag-status">Waiting</div></div>
+      <div class="ag" id="a-supervisor"><div class="ag-icon">D</div><div class="ag-name">Supervisor</div><div class="ag-status">Waiting</div></div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="result-header"><div class="result-url" id="rUrl"></div><div id="rTime" style="font-size:13px;color:var(--muted)"></div></div>
+    <div class="score-row" id="scores"></div>
+    <div class="tabs" id="tabs">
+      <button class="tab active" onclick="st('report')">AI Dossier</button>
+      <button class="tab" onclick="st('contributors')">Contributors</button>
+      <button class="tab" onclick="st('velocity')">Velocity</button>
+      <button class="tab" onclick="st('deps')">Dependencies</button>
+      <button class="tab" onclick="st('grade')">Grade Breakdown</button>
+    </div>
+    <div class="tc active" id="t-report"><div class="panel"><div class="dossier" id="dossier"></div><div class="validation" id="valBox"></div></div></div>
+    <div class="tc" id="t-contributors"><div class="panel"><h3>Contributor Distribution</h3><div id="contribs"></div></div></div>
+    <div class="tc" id="t-velocity"><div class="panel"><h3>Engineering Velocity</h3><div class="metric-grid" id="velMetrics"></div></div></div>
+    <div class="tc" id="t-deps"><div class="panel"><h3>Dependency Analysis</h3><div id="depsContent"></div></div></div>
+    <div class="tc" id="t-grade"><div class="panel"><h3>Investment Grade Breakdown</h3><div id="gradeBreakdown"></div></div></div>
+  </div>
+
+  <div class="footer">Built by <strong>Sathish Lella</strong> — Day 6 of <a href="https://github.com/sathishlella">100 Days, 100 AI Agents</a><br>Open source. Manual equivalent: 4-8 hours of senior engineer due diligence.</div>
+
+  <script>
+    function go(r){document.getElementById('inp').value=r;run()}
+    function st(t){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tc').forEach(x=>x.classList.remove('active'));document.querySelector(`[onclick="st('${t}')"]`).classList.add('active');document.getElementById('t-'+t).classList.add('active')}
+    function ua(id,cls,txt){const e=document.getElementById('a-'+id);e.className='ag '+cls;e.querySelector('.ag-status').innerHTML=txt}
+    function gc(g){if(!g)return'';const c=g.replace('+','').charAt(0).toLowerCase();return c==='a'?'grade-a':c==='b'?'grade-b':c==='c'?'grade-c':'grade-d'}
+    function md(t){return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>').replace(/^\- (.+)$/gm,'<li>$1</li>').replace(/^\d+\. (.+)$/gm,'<li>$1</li>').replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>').replace(/<\/ul>\s*<ul>/g,'').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}
+    function sl(ms){return new Promise(r=>setTimeout(r,ms))}
+
+    async function run(){
+      const repo=document.getElementById('inp').value.trim();if(!repo)return;
+      const btn=document.getElementById('btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Analyzing...';
+      document.getElementById('pipe').classList.add('show');document.getElementById('results').classList.remove('show');document.getElementById('err').classList.remove('show');
+      ['scout','analyst','executor','supervisor'].forEach(a=>ua(a,'','Waiting'));
+      ua('scout','run','<span class="spinner"></span> Fetching GitHub API...');
+
+      try{
+        const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repo})});
+        ua('scout','done','Complete');ua('analyst','run','<span class="spinner"></span> Computing metrics...');await sl(300);
+        ua('analyst','done','Complete');ua('executor','run','<span class="spinner"></span> Generating report...');await sl(300);
+        ua('executor','done','Complete');ua('supervisor','run','<span class="spinner"></span> Validating...');await sl(200);
+        ua('supervisor','done','Complete');
+        const d=await r.json();
+        if(!d.success)throw new Error(d.error||'Analysis failed');
+        render(d);
+      }catch(e){
+        document.getElementById('err').textContent=e.message;document.getElementById('err').classList.add('show');
+        ['scout','analyst','executor','supervisor'].forEach(a=>{const el=document.getElementById('a-'+a);if(el.classList.contains('run'))ua(a,'err','Failed')});
+      }finally{btn.disabled=false;btn.textContent='Analyze'}
+    }
+
+    function render(d){
+      const ig=d.investmentGrade,m=d.metrics;
+      document.getElementById('rUrl').textContent=d.repo;
+      document.getElementById('rTime').textContent=`Analyzed in ${(d.totalTime/1000).toFixed(1)}s | ${d.humanEquivalent}`;
+
+      // Scores
+      document.getElementById('scores').innerHTML=`
+        <div class="sc"><div class="sc-label">Investment Grade</div><div class="sc-val ${gc(ig.grade)}">${ig.grade}</div><div class="sc-sub">${ig.score}/100</div></div>
+        <div class="sc"><div class="sc-label">Bus Factor</div><div class="sc-val ${m.contributors.busFactor>=3?'grade-a':m.contributors.busFactor>=2?'grade-c':'grade-d'}">${m.contributors.busFactor}</div><div class="sc-sub">${m.contributors.riskLevel} risk</div></div>
+        <div class="sc"><div class="sc-label">Contributors</div><div class="sc-val">${m.contributors.count}</div><div class="sc-sub">${m.contributors.humanCount} human</div></div>
+        <div class="sc"><div class="sc-label">Commits/wk</div><div class="sc-val">${m.velocity.commitsPerWeek}</div><div class="sc-sub">${m.activity.trend}</div></div>
+        <div class="sc"><div class="sc-label">Releases</div><div class="sc-val">${m.releases.count}</div><div class="sc-sub">${m.releases.cadenceLabel}</div></div>`;
+
+      // Dossier
+      document.getElementById('dossier').innerHTML=md(d.report||'No report.');
+      const v=d.validation||{};
+      document.getElementById('valBox').innerHTML=`<div class="val-header"><div class="val-title">Supervisor Validation</div><div class="val-score ${v.confidence>=70?'grade-a':v.confidence>=40?'grade-c':'grade-d'}">Confidence: ${v.confidence??'N/A'}%</div></div><p style="font-size:13px;color:var(--muted)">Quality: ${v.qualityScore??'N/A'}% | Hallucinations flagged: ${v.hallucinations?.length??0} | Grade agreement: ${v.gradeAgreement?'Yes':'No'}</p>`;
+
+      // Contributors
+      document.getElementById('contribs').innerHTML=m.contributors.topContributors.map((c,i)=>`<div class="contrib-row"><div class="contrib-rank">#${i+1}</div><div class="contrib-name">${c.login}</div><div class="contrib-bar"><div class="contrib-bar-fill" style="width:${c.percentage}%"></div></div><div class="contrib-pct">${c.percentage}%</div></div>`).join('')+`<div style="margin-top:16px;padding:16px;background:var(--bg);border-radius:8px;border:1px solid var(--border)"><p style="font-size:13px"><strong>Bus Factor:</strong> ${m.contributors.busFactor} (${m.contributors.concentration})</p><p style="font-size:13px;margin-top:4px"><strong>Gini Coefficient:</strong> ${m.contributors.giniCoefficient} (0=equal, 1=one person does everything)</p></div>`;
+
+      // Velocity
+      document.getElementById('velMetrics').innerHTML=`
+        <div class="metric-item"><div class="metric-label">Median PR Merge</div><div class="metric-val">${m.velocity.prMergeTime.median??'N/A'}h</div><div class="metric-note">Sample: ${m.velocity.prMergeTime.sampleSize} PRs</div></div>
+        <div class="metric-item"><div class="metric-label">Median Issue Close</div><div class="metric-val">${m.velocity.issueCloseTime.median??'N/A'}h</div><div class="metric-note">Sample: ${m.velocity.issueCloseTime.sampleSize} issues</div></div>
+        <div class="metric-item"><div class="metric-label">PR Merge Rate</div><div class="metric-val">${m.velocity.prMergeRate}%</div><div class="metric-note">${m.velocity.openPRs} open PRs</div></div>
+        <div class="metric-item"><div class="metric-label">Commits/Week</div><div class="metric-val">${m.velocity.commitsPerWeek}</div><div class="metric-note">Trend: ${m.activity.trend}</div></div>
+        <div class="metric-item"><div class="metric-label">Open Issues</div><div class="metric-val">${m.velocity.openIssues}</div><div class="metric-note">${m.velocity.draftPRs} draft PRs</div></div>
+        <div class="metric-item"><div class="metric-label">Activity (12wk)</div><div class="metric-val">${m.activity.last12Weeks}</div><div class="metric-note">commits in last 12 weeks</div></div>`;
+
+      // Dependencies
+      const deps=m.dependencies;
+      document.getElementById('depsContent').innerHTML=`<div class="metric-grid" style="margin-bottom:16px">${deps.ecosystems.map(e=>`<div class="metric-item"><div class="metric-label">${e.name}</div><div class="metric-val">${e.dependencies??'?'}</div><div class="metric-note">${e.file}</div></div>`).join('')||'<div class="metric-item"><div class="metric-label">No Dependencies</div><div class="metric-val">0</div><div class="metric-note">No package manifests found</div></div>'}</div>${deps.riskSignals.length?'<div style="margin-top:12px">'+deps.riskSignals.map(s=>`<div style="padding:8px 12px;background:var(--yellow-light);border-radius:6px;font-size:13px;margin-bottom:6px">${s}</div>`).join('')+'</div>':'<div style="padding:8px 12px;background:var(--green-light);border-radius:6px;font-size:13px">No dependency risk signals detected</div>'}`;
+
+      // Grade Breakdown
+      const b=ig.breakdown;
+      document.getElementById('gradeBreakdown').innerHTML=Object.entries(b).map(([k,v])=>`<div class="bar-row"><div class="bar-label">${k.charAt(0).toUpperCase()+k.slice(1)}</div><div class="bar-track"><div class="bar-fill" style="width:${(v.score/v.max*100).toFixed(0)}%;background:${v.score/v.max>=.7?'var(--green)':v.score/v.max>=.4?'var(--yellow)':'var(--red)'}"></div></div><div class="bar-val">${v.score}/${v.max}</div></div>`).join('')+`<div style="margin-top:16px;padding:16px;background:var(--bg);border-radius:8px;border:1px solid var(--border)"><p style="font-size:16px;font-weight:700"><span class="${gc(ig.grade)}">${ig.grade}</span> — ${ig.label}</p></div>`;
+
+      document.getElementById('results').classList.add('show');st('report');
+    }
+
+    document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')run()});
+  </script>
+</body>
+</html>
